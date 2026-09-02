@@ -3,34 +3,33 @@ using UnityEngine;
 public class MovimientoPersonaje : MonoBehaviour
 {
     private CharacterController controlador;
-    public float velocidad = 6f;
-    public float gravedad = -9.81f;
+    private Vector3 moveAxis;
+    public float velocity = 6f;
     private Vector3 velocidadMovimiento;
-
+    private Animator animator;
     void Start()
     {
         controlador = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // Obtener teclas de movimiento (WASD / Flechas)
-        float movX = Input.GetAxis("Horizontal");
-        float movZ = Input.GetAxis("Vertical");
+        moveAxis = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        animator.SetFloat("PosX", moveAxis.x);
+        animator.SetFloat("PosZ", moveAxis.z);
 
-        // Calcular dirección basada en hacia dónde mira el objeto
-        Vector3 direccion = transform.right * movX + transform.forward * movZ;
+        Vector3 direction = new Vector3(moveAxis.x, 0f, moveAxis.z).normalized;
 
-        // Mover el personaje en esa dirección
-        controlador.Move(direccion * velocidad * Time.deltaTime);
-
-        // Aplicar gravedad básica
-        if (controlador.isGrounded && velocidadMovimiento.y < 0)
+        if (direction.magnitude >= 0.1f)
         {
-            velocidadMovimiento.y = -2f;
+            Quaternion bearing = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, bearing, 25f * Time.deltaTime);
         }
 
-        velocidadMovimiento.y += gravedad * Time.deltaTime;
+        controlador.Move(direction * velocity * Time.deltaTime);
+
+        velocidadMovimiento.y += velocidadMovimiento.y * Time.deltaTime;
         controlador.Move(velocidadMovimiento * Time.deltaTime);
     }
 }
