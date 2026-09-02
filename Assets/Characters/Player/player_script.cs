@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class MovimientoPersonaje : MonoBehaviour
 {
-    private CharacterController controlador;
+    private CharacterController controller;
     private Vector3 moveAxis;
     public float velocity = 6f;
-    private Vector3 velocidadMovimiento;
+    private Vector3 MovementVelocity;
     private Animator animator;
     void Start()
     {
-        controlador = GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
     }
 
@@ -21,15 +21,24 @@ public class MovimientoPersonaje : MonoBehaviour
 
         Vector3 direction = new Vector3(moveAxis.x, 0f, moveAxis.z).normalized;
 
+
         if (direction.magnitude >= 0.1f)
         {
             Quaternion bearing = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, bearing, 25f * Time.deltaTime);
         }
 
-        controlador.Move(direction * velocity * Time.deltaTime);
+        if (controller.isGrounded && MovementVelocity.y < 0)
+        {
+            MovementVelocity.y = -2f;
+        }
+        else
+        {
+            MovementVelocity.y += -9.8f * Time.deltaTime;
+        }
 
-        velocidadMovimiento.y += velocidadMovimiento.y * Time.deltaTime;
-        controlador.Move(velocidadMovimiento * Time.deltaTime);
+        Vector3 finalMove = direction * velocity;
+        finalMove.y = MovementVelocity.y;
+        controller.Move(finalMove * Time.deltaTime);
     }
 }
