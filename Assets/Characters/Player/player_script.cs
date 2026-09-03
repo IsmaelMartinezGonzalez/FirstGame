@@ -4,9 +4,11 @@ public class MovimientoPersonaje : MonoBehaviour
 {
     private CharacterController controller;
     private Vector3 moveAxis;
-    public float velocity = 6f;
+    private float speed = 6f;
     private Vector3 MovementVelocity;
     private Animator animator;
+    public Joystick joystick;
+    private float xMove, yMove;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -15,19 +17,16 @@ public class MovimientoPersonaje : MonoBehaviour
 
     void Update()
     {
-        moveAxis = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        animator.SetFloat("PosX", moveAxis.x);
-        animator.SetFloat("PosZ", moveAxis.z);
+        Vector3 direction = new Vector3(joystick.Horizontal, 0f, joystick.Vertical).normalized;
 
-        Vector3 direction = new Vector3(moveAxis.x, 0f, moveAxis.z).normalized;
-
-
+        //Rotation
         if (direction.magnitude >= 0.1f)
         {
             Quaternion bearing = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, bearing, 25f * Time.deltaTime);
         }
 
+        //Gravity
         if (controller.isGrounded && MovementVelocity.y < 0)
         {
             MovementVelocity.y = -2f;
@@ -37,8 +36,8 @@ public class MovimientoPersonaje : MonoBehaviour
             MovementVelocity.y += -9.8f * Time.deltaTime;
         }
 
-        Vector3 finalMove = direction * velocity;
-        finalMove.y = MovementVelocity.y;
-        controller.Move(finalMove * Time.deltaTime);
+        Vector3 finalmove = direction * speed;
+        finalmove.y = MovementVelocity.y;
+        controller.Move(finalmove * Time.deltaTime);
     }
 }
