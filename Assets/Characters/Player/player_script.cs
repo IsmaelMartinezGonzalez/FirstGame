@@ -3,7 +3,6 @@ using UnityEngine;
 public class MovimientoPersonaje : MonoBehaviour
 {
     private CharacterController controller;
-    private Vector3 moveAxis;
     private float speed = 6f;
     private Vector3 MovementVelocity;
     private Animator animator;
@@ -19,12 +18,9 @@ public class MovimientoPersonaje : MonoBehaviour
     {
         Vector3 direction = new Vector3(joystick.Horizontal, 0f, joystick.Vertical).normalized;
 
-        //Rotation
-        if (direction.magnitude >= 0.1f)
-        {
-            Quaternion bearing = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, bearing, 25f * Time.deltaTime);
-        }
+        //Set animations
+        animator.SetFloat("PosX", joystick.Horizontal);
+        animator.SetFloat("PosZ", joystick.Vertical);
 
         //Gravity
         if (controller.isGrounded && MovementVelocity.y < 0)
